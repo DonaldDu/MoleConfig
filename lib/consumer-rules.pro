@@ -1,0 +1,1 @@
+-keep,allowshrinking class * implements  com.dhy.moleconfig.IMoleConfig{*;}
