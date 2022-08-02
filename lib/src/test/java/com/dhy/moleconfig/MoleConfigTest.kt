@@ -60,15 +60,15 @@ class MoleConfigTest {
         config.boolean = true
         Assert.assertEquals(true, config.boolean)
 
-        Assert.assertEquals(null, config.accountS?.name)
+        Assert.assertEquals(null, config.serializable?.name)
         val accountS = AccountS().apply { name = "123" }
-        config.accountS = accountS
-        Assert.assertEquals(accountS.name, config.accountS?.name)
+        config.serializable = accountS
+        Assert.assertEquals(accountS.name, config.serializable?.name)
 
-        Assert.assertEquals(null, config.accountP?.name)
+        Assert.assertEquals(null, config.parcelable?.name)
         val accountP = AccountP().apply { name = "123" }
-        config.accountP = accountP
-        Assert.assertEquals(accountP.name, config.accountP?.name)
+        config.parcelable = accountP
+        Assert.assertEquals(accountP.name, config.parcelable?.name)
     }
 }
 

@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 object MoleConfig {
     val dataHandlers: MutableMap<Class<*>, DataHandler<*>> = mutableMapOf()
     var dataHandlerFinder: DataHandlerFinder = object : DataHandlerFinder {}
-    var configKeyPasser: ConfigKeyPasser = object : ConfigKeyPasser {}
+    var configKeyGenerator: ConfigKeyGenerator = object : ConfigKeyGenerator {}
     var configInvocationHandler: ConfigInvocationHandler = object : ConfigInvocationHandler {}
 
     fun initDataHandler(kv: DataStore) {
@@ -32,8 +32,8 @@ fun DataHandler<*>.install(type: KClass<*>) {
     if (javaPrimitiveType != null) MoleConfig.dataHandlers[javaPrimitiveType] = this
 }
 
-interface ConfigKeyPasser {
-    fun pass(method: Method): String {
+interface ConfigKeyGenerator {
+    fun gen(method: Method): String {
         val key = method.name.substring(3)//getXXX or setXXX
         return "${method.declaringClass.name}/$key"
     }
@@ -53,7 +53,7 @@ interface ConfigInvocationHandler {
     fun invoke(method: Method, args: Array<*>?): Any? {
         val dataHandler = MoleConfig.dataHandlerFinder.find(method.configType)
         return if (dataHandler != null) {
-            val key = MoleConfig.configKeyPasser.pass(method)
+            val key = MoleConfig.configKeyGenerator.gen(method)
             if (method.isGet) {
                 dataHandler.get(method, key)
             } else {

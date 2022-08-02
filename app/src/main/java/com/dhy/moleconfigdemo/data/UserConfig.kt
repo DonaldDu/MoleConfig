@@ -6,8 +6,8 @@ import com.dhy.moleconfig.IMoleConfig
 interface UserConfig : IMoleConfig {
     @DefaultConfig("123")
     var defaultConfig: String
-    var accountS: AccountS?
-    var accountP: AccountP?
+    var serializable: AccountS?
+    var parcelable: AccountP?
 
     var string: String?
     var int: Int?

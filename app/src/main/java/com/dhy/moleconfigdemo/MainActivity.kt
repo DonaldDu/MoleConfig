@@ -16,9 +16,9 @@ class MainActivity : AppCompatActivity() {
         config.int = 1
 
         val accountP = AccountP().apply { name = "123" }
-        config.accountP = accountP
+        config.parcelable = accountP
 
         val accountS = AccountS().apply { name = "123" }
-        config.accountS = accountS
+        config.serializable = accountS
     }
 }
