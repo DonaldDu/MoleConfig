@@ -11,14 +11,21 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        usage()
+    }
+
+    fun usage() {
         val config: UserConfig = getMoleConfigInstance()
-        println(config.int)
-        config.int = 1
 
-        val accountP = AccountP().apply { name = "123" }
-        config.parcelable = accountP
+        val newName = System.currentTimeMillis().toString()
+        config.parcelable = AccountP().apply { name = newName }
+        assert(config.parcelable?.name == newName)
 
-        val accountS = AccountS().apply { name = "123" }
-        config.serializable = accountS
+        config.serializable = AccountS().apply { name = newName }
+        assert(config.serializable?.name == newName)
+
+        val now = System.currentTimeMillis()
+        config.long = now
+        assert(config.long == now)
     }
 }

@@ -8,28 +8,28 @@ import java.lang.reflect.Proxy
 import kotlin.reflect.KClass
 
 object MoleConfig {
-    val dataHandlers: MutableMap<Class<*>, DataHandler<*>> = mutableMapOf()
-    var dataHandlerFinder: DataHandlerFinder = object : DataHandlerFinder {}
+    val typeHandlers: MutableMap<Class<*>, TypeHandler<*>> = mutableMapOf()
+    var typeHandlerFinder: TypeHandlerFinder = object : TypeHandlerFinder {}
     var configKeyGenerator: ConfigKeyGenerator = object : ConfigKeyGenerator {}
     var configInvocationHandler: ConfigInvocationHandler = object : ConfigInvocationHandler {}
 
-    fun initDataHandler(kv: DataStore) {
-        StringDataHandler(kv).install(String::class)
-        IntDataHandler(kv).install(Integer::class)
-        LongDataHandler(kv).install(java.lang.Long::class)
-        FlotDataHandler(kv).install(java.lang.Float::class)
-        BooleanDataHandler(kv).install(java.lang.Boolean::class)
-        DoubleDataHandler(kv).install(java.lang.Double::class)
-        ParcelableDataHandler(kv).install(Parcelable::class)
-        SerializableDataHandler(kv).install(Serializable::class)
+    fun initTypeHandler(kv: DataStore) {
+        StringHandler(kv).install(String::class)
+        IntHandler(kv).install(Integer::class)
+        LongHandler(kv).install(java.lang.Long::class)
+        FlotHandler(kv).install(java.lang.Float::class)
+        BooleanHandler(kv).install(java.lang.Boolean::class)
+        DoubleHandler(kv).install(java.lang.Double::class)
+        ParcelableHandler(kv).install(Parcelable::class)
+        SerializableHandler(kv).install(Serializable::class)
     }
 }
 
-fun DataHandler<*>.install(type: KClass<*>) {
-    MoleConfig.dataHandlers[type.java] = this
+fun TypeHandler<*>.install(type: KClass<*>) {
+    MoleConfig.typeHandlers[type.java] = this
 
     val javaPrimitiveType = type.javaPrimitiveType
-    if (javaPrimitiveType != null) MoleConfig.dataHandlers[javaPrimitiveType] = this
+    if (javaPrimitiveType != null) MoleConfig.typeHandlers[javaPrimitiveType] = this
 }
 
 interface ConfigKeyGenerator {
@@ -39,19 +39,19 @@ interface ConfigKeyGenerator {
     }
 }
 
-interface DataHandlerFinder {
-    fun find(clazz: Class<*>): DataHandler<*>? {
-        return MoleConfig.dataHandlers[clazz] ?: if (clazz.isAssignableTo(Parcelable::class.java)) {
-            MoleConfig.dataHandlers[Parcelable::class.java]
+interface TypeHandlerFinder {
+    fun find(clazz: Class<*>): TypeHandler<*>? {
+        return MoleConfig.typeHandlers[clazz] ?: if (clazz.isAssignableTo(Parcelable::class.java)) {
+            MoleConfig.typeHandlers[Parcelable::class.java]
         } else if (clazz.isAssignableTo(Serializable::class.java)) {
-            MoleConfig.dataHandlers[Serializable::class.java]
+            MoleConfig.typeHandlers[Serializable::class.java]
         } else null
     }
 }
 
 interface ConfigInvocationHandler {
     fun invoke(method: Method, args: Array<*>?): Any? {
-        val dataHandler = MoleConfig.dataHandlerFinder.find(method.configType)
+        val dataHandler = MoleConfig.typeHandlerFinder.find(method.configType)
         return if (dataHandler != null) {
             val key = MoleConfig.configKeyGenerator.gen(method)
             if (method.isGet) {
@@ -75,7 +75,7 @@ fun <T : IMoleConfig> getMoleConfigInstance(configClass: Class<T>): T {
     return Proxy.newProxyInstance(configClass.classLoader, arrayOf(configClass), handler) as T
 }
 
-internal val Method.isGet: Boolean get() = name.startsWith("get")
+val Method.isGet: Boolean get() = name.startsWith("get")
 private val Method.configType: Class<*>
     get() {
         return if (isGet) returnType

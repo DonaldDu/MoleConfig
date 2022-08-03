@@ -1,7 +1,12 @@
-package com.dhy.moleconfig
+package com.dhy.moleconfigdemo
 
+import com.dhy.moleconfig.*
+import com.dhy.moleconfigdemo.data.AccountP
+import com.dhy.moleconfigdemo.data.AccountS
+import com.dhy.moleconfigdemo.data.UserConfig
 import org.junit.AfterClass
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +23,7 @@ class MoleConfigTest {
         @BeforeClass
         @JvmStatic
         fun setUp() {
-            MoleConfig.initDataHandler(TempStore.dataStore)
+            MoleConfig.initTypeHandler(TempStore.dataStore)
         }
 
         @AfterClass
@@ -32,56 +37,62 @@ class MoleConfigTest {
     }
 
     @Test
-    fun testMe() {
+    fun usage() {
         val config: UserConfig = getMoleConfigInstance()
 
-        Assert.assertEquals("123", config.defaultConfig)
-        Assert.assertEquals(null, config.string)
+        assertEquals("123", config.stringDefaultConfig)
+        assertEquals(123, config.intDefaultConfig)
+        assertEquals(123L, config.longDefaultConfig)
+        assertEquals(123f, config.floatDefaultConfig)
+        assertEquals(123.0, config.doubleDefaultConfig, 0.0)
+        assertEquals(true, config.booleanDefaultConfig)
+
+        assertEquals(null, config.string)//default value
         config.string = "1"
-        Assert.assertEquals("1", config.string)
+        assertEquals("1", config.string)
 
-        Assert.assertEquals(0, config.int)
+        assertEquals(0, config.int)//default value
         config.int = 1
-        Assert.assertEquals(1, config.int)
+        assertEquals(1, config.int)
 
-        Assert.assertEquals(0L, config.long)
+        assertEquals(0L, config.long)//default value
         config.long = 1
-        Assert.assertEquals(1L, config.long)
+        assertEquals(1L, config.long)
 
-        Assert.assertEquals(0f, config.float)
+        assertEquals(0f, config.float)//default value
         config.float = 1f
-        Assert.assertEquals(1f, config.float)
+        assertEquals(1f, config.float)
 
-        Assert.assertEquals(0.0, config.double)
+        assertEquals(0.0, config.double, 0.0)//default value
         config.double = 1.0
-        Assert.assertEquals(1.0, config.double)
+        assertEquals(1.0, config.double, 0.0)
 
-        Assert.assertEquals(false, config.boolean)
+        assertEquals(false, config.boolean)//default value
         config.boolean = true
-        Assert.assertEquals(true, config.boolean)
+        assertEquals(true, config.boolean)
 
-        Assert.assertEquals(null, config.serializable?.name)
+        assertEquals(null, config.serializable?.name)//default value
         val accountS = AccountS().apply { name = "123" }
         config.serializable = accountS
-        Assert.assertEquals(accountS.name, config.serializable?.name)
+        assertEquals(accountS.name, config.serializable?.name)
 
-        Assert.assertEquals(null, config.parcelable?.name)
+        assertEquals(null, config.parcelable?.name)//default value
         val accountP = AccountP().apply { name = "123" }
         config.parcelable = accountP
-        Assert.assertEquals(accountP.name, config.parcelable?.name)
+        assertEquals(accountP.name, config.parcelable?.name)
     }
 }
 
 private object TempStore {
     private val data: MutableMap<String, Any?> = mutableMapOf()
     private val handler = InvocationHandler { _, method, args ->
-        val key = args.first().toString()
+        val key = args.first() as String
         if (method.isGet) {
             val v = data[key]
             if (v != null) v
             else {
-                val p = args[1]
-                if (p !is Class<*>) p else null
+                val defaultValue = args[1]
+                if (defaultValue !is Class<*>) defaultValue else null
             }
         } else {
             data[key] = args[1]

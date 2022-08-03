@@ -17,8 +17,8 @@ class KvStore(private val kv: MMKV) : SharedPreferences by kv, SharedPreferences
         kv.encode(key, value)
     }
 
-    override fun <T : Parcelable> getParcelable(key: String, value: Class<T>): T? {
-        return kv.decodeParcelable(key, value)
+    override fun <T : Parcelable> getParcelable(key: String, clazz: Class<T>): T? {
+        return kv.decodeParcelable(key, clazz)
     }
 
     override fun getBytes(key: String, defaultValue: ByteArray?): ByteArray? {

@@ -4,12 +4,12 @@ import android.os.Parcelable
 import java.io.*
 import java.lang.reflect.Method
 
-interface DataHandler<T> {
+interface TypeHandler<T> {
     fun get(method: Method, key: String): T?
     fun set(method: Method, key: String, value: Any?)
 }
 
-class IntDataHandler(private val kv: DataStore) : DataHandler<Int> {
+class IntHandler(private val kv: DataStore) : TypeHandler<Int> {
     override fun get(method: Method, key: String): Int {
         return kv.getInt(key, method.defaultConfig?.value?.toInt() ?: 0)
     }
@@ -20,7 +20,7 @@ class IntDataHandler(private val kv: DataStore) : DataHandler<Int> {
     }
 }
 
-class LongDataHandler(private val kv: DataStore) : DataHandler<Long> {
+class LongHandler(private val kv: DataStore) : TypeHandler<Long> {
     override fun get(method: Method, key: String): Long {
         return kv.getLong(key, method.defaultConfig?.value?.toLong() ?: 0)
     }
@@ -31,7 +31,7 @@ class LongDataHandler(private val kv: DataStore) : DataHandler<Long> {
     }
 }
 
-class FlotDataHandler(private val kv: DataStore) : DataHandler<Float> {
+class FlotHandler(private val kv: DataStore) : TypeHandler<Float> {
     override fun get(method: Method, key: String): Float {
         return kv.getFloat(key, method.defaultConfig?.value?.toFloat() ?: 0f)
     }
@@ -42,7 +42,7 @@ class FlotDataHandler(private val kv: DataStore) : DataHandler<Float> {
     }
 }
 
-class BooleanDataHandler(private val kv: DataStore) : DataHandler<Boolean> {
+class BooleanHandler(private val kv: DataStore) : TypeHandler<Boolean> {
     override fun get(method: Method, key: String): Boolean {
         return kv.getBoolean(key, method.defaultConfig?.value?.toBoolean() ?: false)
     }
@@ -53,7 +53,7 @@ class BooleanDataHandler(private val kv: DataStore) : DataHandler<Boolean> {
     }
 }
 
-class DoubleDataHandler(private val kv: DataStore) : DataHandler<Double> {
+class DoubleHandler(private val kv: DataStore) : TypeHandler<Double> {
     override fun get(method: Method, key: String): Double {
         return kv.getDouble(key, method.defaultConfig?.value?.toDouble() ?: 0.0)
     }
@@ -64,7 +64,7 @@ class DoubleDataHandler(private val kv: DataStore) : DataHandler<Double> {
     }
 }
 
-class StringDataHandler(private val kv: DataStore) : DataHandler<String> {
+class StringHandler(private val kv: DataStore) : TypeHandler<String> {
     override fun get(method: Method, key: String): String? {
         return kv.getString(key, method.defaultConfig?.value)
     }
@@ -75,7 +75,7 @@ class StringDataHandler(private val kv: DataStore) : DataHandler<String> {
     }
 }
 
-class ParcelableDataHandler(private val kv: DataStore) : DataHandler<Parcelable> {
+class ParcelableHandler(private val kv: DataStore) : TypeHandler<Parcelable> {
     @Suppress("UNCHECKED_CAST")
     override fun get(method: Method, key: String): Parcelable? {
         return kv.getParcelable(key, method.returnType as Class<Parcelable>)
@@ -87,7 +87,7 @@ class ParcelableDataHandler(private val kv: DataStore) : DataHandler<Parcelable>
     }
 }
 
-class SerializableDataHandler(private val kv: DataStore) : DataHandler<Serializable?> {
+class SerializableHandler(private val kv: DataStore) : TypeHandler<Serializable?> {
     override fun get(method: Method, key: String): Serializable? {
         val data = kv.getBytes(key, null)
         return if (data != null) ObjectInputStream(ByteArrayInputStream(data)).use { it.readObject() as Serializable } else null

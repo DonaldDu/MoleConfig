@@ -7,7 +7,7 @@ interface DataStore : SharedPreferences, SharedPreferences.Editor {
     fun getDouble(key: String, defaultValue: Double): Double
     fun putDouble(key: String, value: Double)
 
-    fun <T : Parcelable> getParcelable(key: String, value: Class<T>): T?
+    fun <T : Parcelable> getParcelable(key: String, clazz: Class<T>): T?
     fun putParcelable(key: String, value: Parcelable?)
 
     fun getBytes(key: String, defaultValue: ByteArray?): ByteArray?
