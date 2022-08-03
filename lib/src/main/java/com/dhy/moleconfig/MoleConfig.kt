@@ -40,27 +40,31 @@ interface ConfigKeyGenerator {
 }
 
 interface TypeHandlerFinder {
-    fun find(clazz: Class<*>): TypeHandler<*>? {
-        return MoleConfig.typeHandlers[clazz] ?: if (clazz.isAssignableTo(Parcelable::class.java)) {
-            MoleConfig.typeHandlers[Parcelable::class.java]
+    @Suppress("IfThenToElvis")
+    fun find(clazz: Class<*>): TypeHandler<out Any?> {
+        val typeHandler = MoleConfig.typeHandlers[clazz]
+        return if (typeHandler != null) {
+            typeHandler
+        } else if (clazz.isAssignableTo(Parcelable::class.java)) {
+            MoleConfig.typeHandlers[Parcelable::class.java]!!
         } else if (clazz.isAssignableTo(Serializable::class.java)) {
-            MoleConfig.typeHandlers[Serializable::class.java]
-        } else null
+            MoleConfig.typeHandlers[Serializable::class.java]!!
+        } else {
+            throw IllegalStateException("no fit typeHandler found for :$clazz")
+        }
     }
 }
 
 interface ConfigInvocationHandler {
     fun invoke(method: Method, args: Array<*>?): Any? {
         val typeHandler = MoleConfig.typeHandlerFinder.find(method.configType)
-        return if (typeHandler != null) {
+        return run {
             val key = MoleConfig.configKeyGenerator.gen(method)
             if (method.isGet) {
                 typeHandler.get(method, key)
             } else {
                 typeHandler.set(method, key, args!!.first())
             }
-        } else {
-            throw IllegalStateException("no fit typeHandler found for :$method")
         }
     }
 }
