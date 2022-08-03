@@ -51,26 +51,26 @@ interface TypeHandlerFinder {
 
 interface ConfigInvocationHandler {
     fun invoke(method: Method, args: Array<*>?): Any? {
-        val dataHandler = MoleConfig.typeHandlerFinder.find(method.configType)
-        return if (dataHandler != null) {
+        val typeHandler = MoleConfig.typeHandlerFinder.find(method.configType)
+        return if (typeHandler != null) {
             val key = MoleConfig.configKeyGenerator.gen(method)
             if (method.isGet) {
-                dataHandler.get(method, key)
+                typeHandler.get(method, key)
             } else {
-                dataHandler.set(method, key, args!!.first())
+                typeHandler.set(method, key, args!!.first())
             }
         } else {
-            throw IllegalStateException("no fit DataHandler found for :$method")
+            throw IllegalStateException("no fit typeHandler found for :$method")
         }
     }
 }
 
-inline fun <reified T : IMoleConfig> getMoleConfigInstance(): T {
+inline fun <reified T : KeepMoleConfig> getMoleConfigInstance(): T {
     return getMoleConfigInstance(T::class.java)
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T : IMoleConfig> getMoleConfigInstance(configClass: Class<T>): T {
+fun <T : KeepMoleConfig> getMoleConfigInstance(configClass: Class<T>): T {
     val handler = InvocationHandler { _, method, args -> MoleConfig.configInvocationHandler.invoke(method, args) }
     return Proxy.newProxyInstance(configClass.classLoader, arrayOf(configClass), handler) as T
 }

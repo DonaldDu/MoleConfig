@@ -1,9 +1,9 @@
 package com.dhy.moleconfigdemo.data
 
 import com.dhy.moleconfig.DefaultConfig
-import com.dhy.moleconfig.IMoleConfig
+import com.dhy.moleconfig.KeepMoleConfig
 
-interface UserConfig : IMoleConfig {
+interface UserConfig : KeepMoleConfig {
     var serializable: AccountS?
     var parcelable: AccountP?
 
