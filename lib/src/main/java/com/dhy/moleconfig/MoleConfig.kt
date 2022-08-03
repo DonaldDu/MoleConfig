@@ -13,15 +13,15 @@ object MoleConfig {
     var configKeyGenerator: ConfigKeyGenerator = object : ConfigKeyGenerator {}
     var configInvocationHandler: ConfigInvocationHandler = object : ConfigInvocationHandler {}
 
-    fun initTypeHandler(kv: DataStore) {
-        StringHandler(kv).install(String::class)
-        IntHandler(kv).install(Integer::class)
-        LongHandler(kv).install(java.lang.Long::class)
-        FlotHandler(kv).install(java.lang.Float::class)
-        BooleanHandler(kv).install(java.lang.Boolean::class)
-        DoubleHandler(kv).install(java.lang.Double::class)
-        ParcelableHandler(kv).install(Parcelable::class)
-        SerializableHandler(kv).install(Serializable::class)
+    fun initTypeHandler(store: DataStore) {
+        StringHandler(store).install(String::class)
+        IntHandler(store).install(Integer::class)
+        LongHandler(store).install(java.lang.Long::class)
+        FlotHandler(store).install(java.lang.Float::class)
+        BooleanHandler(store).install(java.lang.Boolean::class)
+        DoubleHandler(store).install(java.lang.Double::class)
+        ParcelableHandler(store).install(Parcelable::class)
+        SerializableHandler(store).install(Serializable::class)
     }
 }
 
@@ -41,16 +41,16 @@ interface ConfigKeyGenerator {
 
 interface TypeHandlerFinder {
     @Suppress("IfThenToElvis")
-    fun find(clazz: Class<*>): TypeHandler<out Any?> {
-        val typeHandler = MoleConfig.typeHandlers[clazz]
+    fun find(configType: Class<*>): TypeHandler<out Any?> {
+        val typeHandler = MoleConfig.typeHandlers[configType]
         return if (typeHandler != null) {
             typeHandler
-        } else if (clazz.isAssignableTo(Parcelable::class.java)) {
+        } else if (configType.isAssignableTo(Parcelable::class.java)) {
             MoleConfig.typeHandlers[Parcelable::class.java]!!
-        } else if (clazz.isAssignableTo(Serializable::class.java)) {
+        } else if (configType.isAssignableTo(Serializable::class.java)) {
             MoleConfig.typeHandlers[Serializable::class.java]!!
         } else {
-            throw IllegalStateException("no fit typeHandler found for :$clazz")
+            throw IllegalStateException("no fit typeHandler found for :$configType")
         }
     }
 }

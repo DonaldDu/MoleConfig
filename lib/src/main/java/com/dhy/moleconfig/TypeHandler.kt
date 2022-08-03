@@ -9,87 +9,87 @@ interface TypeHandler<T> {
     fun set(method: Method, key: String, value: Any?)
 }
 
-class IntHandler(private val kv: DataStore) : TypeHandler<Int> {
+class IntHandler(private val store: DataStore) : TypeHandler<Int> {
     override fun get(method: Method, key: String): Int {
-        return kv.getInt(key, method.defaultConfig?.value?.toInt() ?: 0)
+        return store.getInt(key, method.defaultConfig?.value?.toInt() ?: 0)
     }
 
     override fun set(method: Method, key: String, value: Any?) {
-        if (value != null) kv.putInt(key, value as Int)
-        else kv.remove(key)
+        if (value != null) store.putInt(key, value as Int)
+        else store.remove(key)
     }
 }
 
-class LongHandler(private val kv: DataStore) : TypeHandler<Long> {
+class LongHandler(private val store: DataStore) : TypeHandler<Long> {
     override fun get(method: Method, key: String): Long {
-        return kv.getLong(key, method.defaultConfig?.value?.toLong() ?: 0)
+        return store.getLong(key, method.defaultConfig?.value?.toLong() ?: 0)
     }
 
     override fun set(method: Method, key: String, value: Any?) {
-        if (value != null) kv.putLong(key, value as Long)
-        else kv.remove(key)
+        if (value != null) store.putLong(key, value as Long)
+        else store.remove(key)
     }
 }
 
-class FlotHandler(private val kv: DataStore) : TypeHandler<Float> {
+class FlotHandler(private val store: DataStore) : TypeHandler<Float> {
     override fun get(method: Method, key: String): Float {
-        return kv.getFloat(key, method.defaultConfig?.value?.toFloat() ?: 0f)
+        return store.getFloat(key, method.defaultConfig?.value?.toFloat() ?: 0f)
     }
 
     override fun set(method: Method, key: String, value: Any?) {
-        if (value != null) kv.putFloat(key, value as Float)
-        else kv.remove(key)
+        if (value != null) store.putFloat(key, value as Float)
+        else store.remove(key)
     }
 }
 
-class BooleanHandler(private val kv: DataStore) : TypeHandler<Boolean> {
+class BooleanHandler(private val store: DataStore) : TypeHandler<Boolean> {
     override fun get(method: Method, key: String): Boolean {
-        return kv.getBoolean(key, method.defaultConfig?.value?.toBoolean() ?: false)
+        return store.getBoolean(key, method.defaultConfig?.value?.toBoolean() ?: false)
     }
 
     override fun set(method: Method, key: String, value: Any?) {
-        if (value != null) kv.putBoolean(key, value as Boolean)
-        else kv.remove(key)
+        if (value != null) store.putBoolean(key, value as Boolean)
+        else store.remove(key)
     }
 }
 
-class DoubleHandler(private val kv: DataStore) : TypeHandler<Double> {
+class DoubleHandler(private val store: DataStore) : TypeHandler<Double> {
     override fun get(method: Method, key: String): Double {
-        return kv.getDouble(key, method.defaultConfig?.value?.toDouble() ?: 0.0)
+        return store.getDouble(key, method.defaultConfig?.value?.toDouble() ?: 0.0)
     }
 
     override fun set(method: Method, key: String, value: Any?) {
-        if (value != null) kv.putDouble(key, value as Double)
-        else kv.remove(key)
+        if (value != null) store.putDouble(key, value as Double)
+        else store.remove(key)
     }
 }
 
-class StringHandler(private val kv: DataStore) : TypeHandler<String> {
+class StringHandler(private val store: DataStore) : TypeHandler<String> {
     override fun get(method: Method, key: String): String? {
-        return kv.getString(key, method.defaultConfig?.value)
+        return store.getString(key, method.defaultConfig?.value)
     }
 
     override fun set(method: Method, key: String, value: Any?) {
-        if (value != null) kv.putString(key, value as String)
-        else kv.remove(key)
+        if (value != null) store.putString(key, value as String)
+        else store.remove(key)
     }
 }
 
-class ParcelableHandler(private val kv: DataStore) : TypeHandler<Parcelable> {
+class ParcelableHandler(private val store: DataStore) : TypeHandler<Parcelable> {
     @Suppress("UNCHECKED_CAST")
     override fun get(method: Method, key: String): Parcelable? {
-        return kv.getParcelable(key, method.returnType as Class<Parcelable>)
+        return store.getParcelable(key, method.returnType as Class<Parcelable>)
     }
 
     override fun set(method: Method, key: String, value: Any?) {
-        if (value != null) kv.putParcelable(key, value as Parcelable)
-        else kv.remove(key)
+        if (value != null) store.putParcelable(key, value as Parcelable)
+        else store.remove(key)
     }
 }
 
-class SerializableHandler(private val kv: DataStore) : TypeHandler<Serializable?> {
+class SerializableHandler(private val store: DataStore) : TypeHandler<Serializable?> {
     override fun get(method: Method, key: String): Serializable? {
-        val data = kv.getBytes(key, null)
+        val data = store.getBytes(key, null)
         return if (data != null) ObjectInputStream(ByteArrayInputStream(data)).use { it.readObject() as Serializable } else null
     }
 
@@ -98,7 +98,7 @@ class SerializableHandler(private val kv: DataStore) : TypeHandler<Serializable?
             val data = ByteArrayOutputStream()
             ObjectOutputStream(data).use { it.writeObject(value) }
             val bytes = data.toByteArray()
-            kv.putBytes(key, bytes)
-        } else kv.remove(key)
+            store.putBytes(key, bytes)
+        } else store.remove(key)
     }
 }
