@@ -58,13 +58,11 @@ interface TypeHandlerFinder {
 interface ConfigInvocationHandler {
     fun invoke(method: Method, args: Array<*>?): Any? {
         val typeHandler = MoleConfig.typeHandlerFinder.find(method.configType)
-        return run {
-            val key = MoleConfig.configKeyGenerator.gen(method)
-            if (method.isGet) {
-                typeHandler.get(method, key)
-            } else {
-                typeHandler.set(method, key, args!!.first())
-            }
+        val key = MoleConfig.configKeyGenerator.gen(method)
+        return if (method.isGet) {
+            typeHandler.get(method, key)
+        } else {
+            typeHandler.set(method, key, args!!.first())
         }
     }
 }
