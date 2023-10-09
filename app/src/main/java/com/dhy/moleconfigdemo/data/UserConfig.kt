@@ -31,4 +31,14 @@ interface UserConfig : KeepMoleConfig {
 
     @DefaultConfig("true")
     var booleanDefaultConfig: Boolean
+
+    /**
+     * 枚举默认用Serializable处理，
+     * 类名及枚举名都会序列化为字节码后保存
+     * */
+    var color: ColorEnum?
+}
+
+enum class ColorEnum {
+    WHITE, BLACK, RED
 }

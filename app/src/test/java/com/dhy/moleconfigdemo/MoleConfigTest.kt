@@ -3,6 +3,7 @@ package com.dhy.moleconfigdemo
 import com.dhy.moleconfig.*
 import com.dhy.moleconfigdemo.data.AccountP
 import com.dhy.moleconfigdemo.data.AccountS
+import com.dhy.moleconfigdemo.data.ColorEnum
 import com.dhy.moleconfigdemo.data.UserConfig
 import org.junit.AfterClass
 import org.junit.Assert
@@ -80,6 +81,10 @@ class MoleConfigTest {
         val accountP = AccountP().apply { name = "123" }
         config.parcelable = accountP
         assertEquals(accountP.name, config.parcelable?.name)
+
+        assertEquals(null, config.color)//default value
+        config.color = ColorEnum.BLACK
+        assertEquals(ColorEnum.BLACK, config.color)
     }
 }
 
